@@ -16,8 +16,8 @@ jobs:
         run: |
           python3 -m json.tool grafana/dashboards/checkout.json >/dev/null
           docker compose config --quiet
-          docker compose run --rm --no-deps prometheus promtool check rules /etc/prometheus/alerts.yml
-          docker compose run --rm --no-deps prometheus promtool test rules /etc/prometheus/alert-tests.yml
+          docker compose run --rm --no-deps --entrypoint promtool prometheus check rules /etc/prometheus/alerts.yml
+          docker compose run --rm --no-deps --entrypoint promtool prometheus test rules /etc/prometheus/alert-tests.yml
       - name: Subir stack e testar coleta
         run: |
           docker compose up -d --build

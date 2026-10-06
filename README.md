@@ -8,7 +8,7 @@ Requer Docker com Compose, Node 22+ para os testes locais, `curl` e Python 3 par
 
 ```bash
 npm test
-docker compose run --rm --no-deps prometheus promtool test rules /etc/prometheus/alert-tests.yml
+docker compose run --rm --no-deps --entrypoint promtool prometheus test rules /etc/prometheus/alert-tests.yml
 docker compose up -d --build
 bash scripts/smoke.sh
 ```

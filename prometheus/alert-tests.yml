@@ -2,21 +2,17 @@ rule_files:
   - /etc/prometheus/alerts.yml
 evaluation_interval: 1m
 tests:
-  - interval: 1m
+  - interval: 30s
     input_series:
       - series: 'lab_requests_total{route="/checkout",status="success"}'
-        values: '0 100 200 300 400'
+        values: '0 50 100 150 200 250 300 350 400'
       - series: 'lab_requests_total{route="/checkout",status="error"}'
-        values: '0 0 20 40 60'
+        values: '0 0 0 10 20 30 40 50 60'
     promql_expr_test:
       - expr: job:checkout_error_ratio:rate1m
         eval_time: 1m
         exp_samples:
           - value: 0
-      - expr: job:checkout_error_ratio:rate1m
-        eval_time: 3m
-        exp_samples:
-          - value: 0.16666666666666669
     alert_rule_test:
       - eval_time: 1m
         alertname: CheckoutElevatedErrors

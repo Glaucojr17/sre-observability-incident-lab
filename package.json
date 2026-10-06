@@ -1,0 +1,13 @@
+{
+  "name": "sre-observability-incident-lab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Laboratório reproduzível de SLIs, alertas e investigação de incidentes",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

@@ -1,0 +1,17 @@
+groups:
+  - name: checkout-reliability
+    rules:
+      - record: job:checkout_error_ratio:rate1m
+        expr: |
+          sum(rate(lab_requests_total{route="/checkout",status="error"}[1m]))
+          /
+          clamp_min(sum(rate(lab_requests_total{route="/checkout"}[1m])), 0.001)
+      - alert: CheckoutElevatedErrors
+        expr: job:checkout_error_ratio:rate1m > 0.05
+        for: 30s
+        labels:
+          severity: warning
+          service: checkout-lab
+        annotations:
+          summary: "Mais de 5% de erros no checkout de laboratório"
+          description: "Verifique a taxa de erros, o alvo de scrape e a simulação antes de atuar."

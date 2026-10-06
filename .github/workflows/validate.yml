@@ -1,0 +1,30 @@
+name: Validate SRE lab
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Testar API
+        run: npm test
+      - name: Validar dashboard, compose e regras
+        run: |
+          python3 -m json.tool grafana/dashboards/checkout.json >/dev/null
+          docker compose config --quiet
+          docker compose run --rm --no-deps prometheus promtool check rules /etc/prometheus/alerts.yml
+          docker compose run --rm --no-deps prometheus promtool test rules /etc/prometheus/alert-tests.yml
+      - name: Subir stack e testar coleta
+        run: |
+          docker compose up -d --build
+          bash scripts/smoke.sh
+      - name: Diagnóstico e limpeza
+        if: always()
+        run: |
+          docker compose ps
+          docker compose logs --tail=100
+          docker compose down -v --remove-orphans

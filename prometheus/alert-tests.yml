@@ -1,0 +1,32 @@
+rule_files:
+  - alerts.yml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'lab_requests_total{route="/checkout",status="success"}'
+        values: '0 100 200 300 400'
+      - series: 'lab_requests_total{route="/checkout",status="error"}'
+        values: '0 0 20 40 60'
+    promql_expr_test:
+      - expr: job:checkout_error_ratio:rate1m
+        eval_time: 1m
+        exp_samples:
+          - value: 0
+      - expr: job:checkout_error_ratio:rate1m
+        eval_time: 3m
+        exp_samples:
+          - value: 0.16666666666666669
+    alert_rule_test:
+      - eval_time: 1m
+        alertname: CheckoutElevatedErrors
+        exp_alerts: []
+      - eval_time: 3m
+        alertname: CheckoutElevatedErrors
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              service: checkout-lab
+            exp_annotations:
+              summary: "Mais de 5% de erros no checkout de laboratório"
+              description: "Verifique a taxa de erros, o alvo de scrape e a simulação antes de atuar."
